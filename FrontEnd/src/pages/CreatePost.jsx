@@ -37,7 +37,7 @@ export default function CreatePost(){
             {isEdit == "Save"? <input defaultValue={title} onInput={(e)=>{settitle(e.target.value)}} type="text" placeholder="Title"  className="w-3xl m-2 border-2 border-black text-gray-800 rounded-2xl p-1 pl-2"/> : <div className="w-3xl m-2 border-2 border-black rounded-2xl text-black p-1 pl-2" >{title}</div>}
             
             {isEdit == "Save" ? <textarea defaultValue={desc} onInput={(e)=>{setDesc(e.target.value)}}  placeholder="Description" style={{scrollbarWidth : "none"}} className="w-3xl h-90 m-2 border-2 border-black text-gray-800 rounded-2xl p-1 pl-2 "></textarea> : 
-            <div className="w-3xl h-90 m-2 border-2 border-black rounded-2xl text-black p-1 pl-2 ">{desc}</div>}
+            <div className="w-3xl overflow-scroll  h-90 m-2 border-2 border-black rounded-2xl text-black p-1 pl-2 " style={{scrollbarWidth:"none"}}>{desc}</div>}
             
         </div>
         <div className="w-full flex justify-end">
