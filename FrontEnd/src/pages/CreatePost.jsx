@@ -17,6 +17,7 @@ export default function CreatePost(){
             setisEdit("Save")
         }
     }
+    
 
     return (
         <div className="w-screen h-screen flex  items-center justify-center">
