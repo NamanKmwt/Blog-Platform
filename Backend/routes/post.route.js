@@ -111,9 +111,8 @@ router.put('/update' , authMiddleware, async function(req, res){
 })
 
 router.put('/upvote' , authMiddleware ,async function(req, res){
-        const postId = req.body.postId
-        const inc = req.body.inc
-        if(!postId){
+    const postId = req.body.postId
+    if(!postId){
         return res.status(403).json({
             msg : "Post doesn't exist"
         })
@@ -124,31 +123,36 @@ router.put('/upvote' , authMiddleware ,async function(req, res){
             msg : "Didn't able to find post"
         })
     }
-    const count = post.upvote ;
-    if(inc == true){
-        await Post.updateOne({_id : post._id} , {
-            "$set":{
-                upvote : count + 1
-            }
-        })
-    }else{
-        await Post.updateOne({_id : post._id} , {
-            "$set":{
-               upvote :count-1
-            }
+    const user = await User.findOne({username : req.userID});
+    if(!user){
+        return res.status(403).json({
+            msg : "User doesn't exist"
         })
     }
 
+    const userId = user._id.toString();
+    const alreadyUpvoted = post.upvoters.some((id) => id.toString() === userId);
+
+    if(alreadyUpvoted){
+        post.upvoters = post.upvoters.filter((id) => id.toString() !== userId);
+    }else{
+        post.upvoters.push(user._id);
+        post.downvoters = post.downvoters.filter((id) => id.toString() !== userId);
+    }
+
+    await post.save();
+
     res.status(200).json({
-        upvote : post.upvote, 
+        upvote : post.upvoters.length,
+        downvote : post.downvoters.length,
+        userVote : alreadyUpvoted ? null : "up",
         msg : "interaction recorded"
     })
 })
 
 router.put('/downvote' , authMiddleware ,async function(req, res){
-        const postId = req.body.postId
-        const inc = req.body.inc
-        if(!postId){
+    const postId = req.body.postId
+    if(!postId){
         return res.status(403).json({
             msg : "Post doesn't exist"
         })
@@ -159,24 +163,29 @@ router.put('/downvote' , authMiddleware ,async function(req, res){
             msg : "Didn't able to find post"
         })
     }
-
-    const count = post.downvote
-    if(inc == true){
-        await Post.updateOne({_id : post._id} , {
-            "$set":{
-                downvote : count + 1
-            }
+    const user = await User.findOne({username : req.userID});
+    if(!user){
+        return res.status(403).json({
+            msg : "User doesn't exist"
         })
-    }else if(count > 0){
-        await Post.updateOne({_id : post._id} , {
-            "$set":{
-               downvote : count -1
-            }
-        })
-
     }
+
+    const userId = user._id.toString();
+    const alreadyDownvoted = post.downvoters.some((id) => id.toString() === userId);
+
+    if(alreadyDownvoted){
+        post.downvoters = post.downvoters.filter((id) => id.toString() !== userId);
+    }else{
+        post.downvoters.push(user._id);
+        post.upvoters = post.upvoters.filter((id) => id.toString() !== userId);
+    }
+
+    await post.save();
+
     res.status(200).json({
-        downvote : post.downvote, 
+        upvote : post.upvoters.length,
+        downvote : post.downvoters.length,
+        userVote : alreadyDownvoted ? null : "down",
         msg : "interaction recorded"
     })
 })

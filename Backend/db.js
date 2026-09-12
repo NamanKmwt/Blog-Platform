@@ -40,15 +40,17 @@ const postSchema = mongoose.Schema({
     isEditable : {
         type : Boolean,
         default : false
-    }, 
-    upvote : {
-        type : Number, 
-        default : 0
-    }, 
-    downvote : {
-        type : Number, 
-        default : 0
-    }
+    },
+    upvoters : [{
+        type : mongoose.Schema.Types.ObjectId,
+        ref : 'User',
+        default : []
+    }],
+    downvoters : [{
+        type : mongoose.Schema.Types.ObjectId,
+        ref : 'User',
+        default : []
+    }]
 })
 
 const User = mongoose.model('User', userSchema);
